@@ -8,3 +8,6 @@ Usage  ##
 python3 osc_vlc_360.py
 osc_simple_client.py
 
+## OSC Commands ##
+/video/play/ {string} / args
+
