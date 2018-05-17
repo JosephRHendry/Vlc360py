@@ -2,9 +2,11 @@
 
 VLC 360 Player Built on top of an OSC server
 
-installation ##
+## installation ##
+pip3 install python-vlc
+pip3 install python-osc
 
-Usage  ##
+## Usage  ##
 python3 osc_vlc_360.py
 osc_simple_client.py
 
