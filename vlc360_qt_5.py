@@ -21,7 +21,7 @@ class Player(QtWidgets.QMainWindow):
         self.instance = vlc.Instance()
         # creating an empty vlc media player
         self.mediaplayer = self.instance.media_player_new(
-            'V3.mp4')
+            'V1.mp4')
 
         self.createUI()
         self.isPaused = False
@@ -36,10 +36,10 @@ class Player(QtWidgets.QMainWindow):
         #viewpoint = vlc.VideoViewpoint(45.0, 20.0, 0.0, 45.0)
 
         self.viewpoint = vlc.VideoViewpoint()
-        self.viewpoint.yaw = .1
-        self.viewpoint.pitch = .0
-        self.viewpoint.roll  = .0
-        self.viewpoint.field_of_view =.001
+        self.viewpoint.yaw = .30
+        self.viewpoint.pitch = .03
+        self.viewpoint.roll  = .03
+        self.viewpoint.field_of_view =.21
         self.switch = 1
         #self.mediaplayer.video_update_viewpoint(viewpoint, True)
 
