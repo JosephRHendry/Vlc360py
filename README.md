@@ -11,5 +11,5 @@ python3 osc_vlc_360.py
 osc_simple_client.py
 
 ## OSC Commands ##
-/vlc/file/ {filename} optional coordinates [yaw, pitch, roll]
+/vlc/file/ {filename} optional - [yaw, pitch, roll]
 
