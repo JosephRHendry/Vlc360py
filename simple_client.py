@@ -21,8 +21,12 @@ if __name__ == "__main__":
 
   client = udp_client.SimpleUDPClient(args.ip, args.port)
 
-  for x in range(10):
+  for x in range(1):
     client.send_message("/filter", random.random())
-    message = ["Play"]
-    client.send_message("/pause", message)
+    file = "V2.mp4"
+    coords = [200, 50, 100]
+    message = [file, coords]
+    client.send_message("/pause", True)
+    #client.send_message("/vlc/file", file)
+    client.send_message("/vlc/file", message)
     time.sleep(1)
