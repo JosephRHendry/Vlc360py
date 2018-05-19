@@ -36,14 +36,40 @@ class OSC_Server(vlc360.Player):
     print("args :", args)
     print("volume :", volume)
 
+  """def load_file(self, args, file):
+      print("Hi", args[0], file)
+      i = vlc360.vlc.Instance()
+      m = i.media_new(str(file))
+      print(m)
+      m.get_mrl()
+      self.player.mediaplayer.set_media(m)
+      self.player.mediaplayer.play()"""
+  def load_file(self, args, file, coords=[0,0,0]):
+      i = vlc360.vlc.Instance()
+      m = i.media_new(str(file))
+
+      v = vlc360.vlc.libvlc_video_new_viewpoint()
+      v.yaw = coords[0]
+      v.pitch = coords[1]
+      v.roll = coords[2]
+      print(file, coords)
+      self.player.mediaplayer.video_update_viewpoint(v, True)
+
+      print(m)
+      m.get_mrl()
+      self.player.mediaplayer.set_media(m)
+      self.player.mediaplayer.play()
+  def play(self, file, args):
+      i = vlc360.vlc.Instance()
+      m = i.media_new('V1.mp4')
+      m.get_mrl()
+      self.player.mediaplayer.set_media(m)
+      self.player.mediaplayer.play()
   def pause(self, word, word2, word3):
     if(self.player.mediaplayer.get_state() == vlc360.vlc.State.Playing):
-      print("Howdy")
       self.player.mediaplayer.pause()
-    else:
-      self.player.mediaplayer.pause()
-      print("FAIL :", self.player.mediaplayer.get_state())
-      print("State :" ,self.player.mediaplayer.get_state() == vlc360.vlc.State.Paused)
+    #else:
+      #self.player.mediaplayer.pause()
     #print(self.player.mediaplayer.get_state())
 
   def report_back(unused_addr, args, volume):
@@ -56,6 +82,7 @@ class OSC_Server(vlc360.Player):
 
     self.dispatcher.map("/volume", self.print_volume_handler, "Volume")
     self.dispatcher.map("/logvolume", self.print_compute_handler, "Log volume", math.log)
+    self.dispatcher.map("/vlc/file", self.load_file)
 
     self.server = osc_server.ThreadingOSCUDPServer(
         (self.args.ip, self.args.port), self.dispatcher)
@@ -66,7 +93,7 @@ class OSC_Server(vlc360.Player):
 
       self.player = vlc360.Player()
       self.player.show()
-      self.player.showFullScreen()
+      #self.player.showFullScreen()
 
       # player.resize(640, 480)
       self.player.resize(1024, 768)
