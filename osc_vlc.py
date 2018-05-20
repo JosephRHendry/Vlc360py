@@ -5,7 +5,7 @@ received packets.
 """
 import argparse
 import math
-import vlc360_qt_5 as vlc360
+import vlc360_qt_7 as vlc360
 import threading
 import time
 
@@ -15,14 +15,17 @@ from pythonosc import osc_server
 class OSC_Server(vlc360.Player):
   def start_osc(self): #__init__(self):
     self.parser = argparse.ArgumentParser()
+    #self.parser.add_argument("--ip",
+    #                    default="127.0.0.1", help="The ip to listen on")
     self.parser.add_argument("--ip",
-                        default="127.0.0.1", help="The ip to listen on")
+                             default="192.168.248.137", help="The ip to listen on")
     self.parser.add_argument("--port",
                         type=int, default=5005, help="The port to listen on")
     self.args = self.parser.parse_args()
 
     self.dispatcher = dispatcher.Dispatcher()
     self.messages = []
+    self.threads = []
 
   def print_volume_handler(unused_addr, args, volume):
     print("[{0}] ~ {1}".format(args[0], volume))
@@ -44,27 +47,81 @@ class OSC_Server(vlc360.Player):
       m.get_mrl()
       self.player.mediaplayer.set_media(m)
       self.player.mediaplayer.play()"""
-  def load_file(self, args, file, coords=[0,0,0]):
+  def load_file(self, args, file, coords= [0, 0, 0, 0]):
       i = vlc360.vlc.Instance()
       m = i.media_new(str(file))
 
-      v = vlc360.vlc.libvlc_video_new_viewpoint()
-      v.yaw = coords[0]
-      v.pitch = coords[1]
-      v.roll = coords[2]
-      print(file, coords)
-      self.player.mediaplayer.video_update_viewpoint(v, True)
+      yaw = coords[0]
+      pitch = coords[1]
+      roll = coords[2]
+      field_of_view = coords[3]
+      v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
+      print(file, coords, v)
 
       print(m)
       m.get_mrl()
+
+      #self.player.mediaplayer.video_update_viewpoint(v, True)
+
       self.player.mediaplayer.set_media(m)
       self.player.mediaplayer.play()
+      vlc360.vlc.libvlc_video_update_viewpoint(self.player.mediaplayer, v, True)
+
+  def pan(self, args, coords=[0,0,0,0]):
+      """
+      Continuously pans around in all directions at the increments specified
+      :param args: list
+      :param coords: pitch, yaw roll
+      :return:
+      """
+      print("pan_cont")
+
+      yaw = coords[0]
+      pitch = coords[1]
+      roll = coords[2]
+      field_of_view = coords[3]
+      v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
+      #print("v :", v)
+      self.player.mediaplayer.v = v
+
+      if len(self.threads) == 0:
+          self.loopThread = threading.Thread(target=self.player.playloop(v))
+          self.threads.append(self.loopThread)
+          self.loopThread.start()
+
+      #else:
+      #    self.player.mediaplayer.video_update_viewpoint(v, False)
+
+
+  def pov(self, args, coords=[0, 0, 0, 0]):
+     """
+     Sets a playing video to the specified coordinates
+     :param args: a list
+     :param coords: here the first element of the list will be coords, ie a list of 4 variables, yaw, pitch, roll, fov
+     :return:
+     """
+      print("pov")
+      yaw = coords[0]
+      pitch = coords[1]
+      roll = coords[2]
+      field_of_view = coords[3]
+      v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
+      print("v :",v)
+      self.player.mediaplayer.video_update_viewpoint(v, True)
+
   def play(self, file, args):
+      """
+      Deprecated - see load_file, an overloaded version of the same function
+      :param file:
+      :param args:
+      :return:
+      """
       i = vlc360.vlc.Instance()
       m = i.media_new('V1.mp4')
       m.get_mrl()
       self.player.mediaplayer.set_media(m)
       self.player.mediaplayer.play()
+
   def pause(self, word, word2, word3):
     if(self.player.mediaplayer.get_state() == vlc360.vlc.State.Playing):
       self.player.mediaplayer.pause()
@@ -83,6 +140,8 @@ class OSC_Server(vlc360.Player):
     self.dispatcher.map("/volume", self.print_volume_handler, "Volume")
     self.dispatcher.map("/logvolume", self.print_compute_handler, "Log volume", math.log)
     self.dispatcher.map("/vlc/file", self.load_file)
+    self.dispatcher.map("/vlc/pov", self.pov)
+    self.dispatcher.map("/vlc/pan", self.pan)
 
     self.server = osc_server.ThreadingOSCUDPServer(
         (self.args.ip, self.args.port), self.dispatcher)
@@ -90,33 +149,32 @@ class OSC_Server(vlc360.Player):
     self.server.serve_forever()
 
   def startVlc(self):
+      #coords = [40, 20, 140, 80]
+      #file = 'V1.mp4'
+
+      self.instance = vlc360.vlc.Instance()
+
+      #self.m = self.instance.media_new(file)
 
       self.player = vlc360.Player()
       self.player.show()
-      #self.player.showFullScreen()
+      # self.player.showFullScreen()
 
-      # player.resize(640, 480)
+
+      #print(file, coords, v)
+
+      #print(self.m)
+      #self.m.get_mrl()
+
       self.player.resize(1024, 768)
       if vlc360.sys.argv[1:]:
           self.player.OpenFile(vlc360.sys.argv[1])
 
+      """
       self.threads = []
-      # playThread = threading.Thread(target = player.mediaplayer.play)
-      self.player.mediaplayer.play()
-
-      exit_flag = threading.Event()
-
       self.loopThread = threading.Thread(target=self.player.playloop)
-
       self.threads.append(self.loopThread)
       self.loopThread.start()
-
-      """
-      Test of loading time
-      for x in range(5):
-        time.sleep(5)
-        self.player.mediaplayer.set_mrl('V2.mp4')
-        self.player.mediaplayer.play()
       """
       vlc360.sys.exit(self.app.exec_())
 
