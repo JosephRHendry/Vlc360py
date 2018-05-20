@@ -5,7 +5,7 @@ received packets.
 """
 import argparse
 import math
-import vlc360_qt_7 as vlc360
+import vlc360_qt as vlc360
 import threading
 import time
 
