@@ -20,28 +20,17 @@ class Player(QtWidgets.QMainWindow):
         # creating a basic vlc instance
         self.instance = vlc.Instance()
         # creating an empty vlc media player
-        self.mediaplayer = self.instance.media_player_new(
-            'V1.mp4')
+        self.mediaplayer = self.instance.media_player_new()
 
         self.createUI()
         self.isPaused = False
-        if sys.platform.startswith('linux'): # for Linux using the X Server
+        if sys.platform.startswith('linux'):  # for Linux using the X Server
             self.mediaplayer.set_xwindow(self.videoframe.winId())
-        elif sys.platform == "win32": # for Windows
+        elif sys.platform == "win32":  # for Windows
             self.mediaplayer.set_hwnd(self.videoframe.winId())
-        elif sys.platform == "darwin": # for MacOS
+        elif sys.platform == "darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
-#       viewpoint = vlc.libvlc_video_new_viewpoint()
-        #viewpoint = vlc.VideoViewpoint(45.0, 20.0, 0.0, 45.0)
-
-        self.viewpoint = vlc.VideoViewpoint()
-        self.viewpoint.yaw = .30
-        self.viewpoint.pitch = .03
-        self.viewpoint.roll  = .03
-        self.viewpoint.field_of_view =.21
-        self.switch = 1
-        #self.mediaplayer.video_update_viewpoint(viewpoint, True)
 
     def keyPressEvent(self, e):
         if e.key() == QtCore.Qt.Key_Escape:
@@ -53,9 +42,10 @@ class Player(QtWidgets.QMainWindow):
             else:
                 self.showNormal()
                 self.switch = 0
-    def playloop(self):
+    def playloop(self, v):
         while not self.exit_flag.wait(timeout=0.01):
-            self.mediaplayer.video_update_viewpoint(self.viewpoint, False)
+            self.mediaplayer.video_update_viewpoint(self.mediaplayer.v, False)
+            continue
 
 
     def createUI(self):
