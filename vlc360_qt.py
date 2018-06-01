@@ -31,6 +31,8 @@ class Player(QtWidgets.QMainWindow):
         elif sys.platform == "darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
+        self.switch = 0
+
 
     def keyPressEvent(self, e):
         if e.key() == QtCore.Qt.Key_Escape:
