@@ -38,28 +38,30 @@ if __name__ == "__main__":
         level = 1.0
         message=[level]
         client.send_message("/vlc/fade", message)
+        time.sleep(2)
 
-        #coords = [0.02, 0, 0,0]
-        #message = [coords]
-        #client.send_message("/vlc/pan", message)
+        coords = [0.02, 0, 0,0]
+        message = [coords]
+        client.send_message("/vlc/pan", message)
 
         time.sleep(4)
 
 
-        file = "V3.mp4"
+        file = "V2.mp4"
         coords = [100,8, 4, 120]
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(3)
 
-        level = 2.0
+        level = 1.0
         message = [level]
         client.send_message("/vlc/saturation", message)
         time.sleep(4)
 
-        level = 1.0
+        """level = 1.0
         message = [level]
         client.send_message("/vlc/saturation", message)
+        """
 
         client.send_message("/vlc/watch_end", message)
 
