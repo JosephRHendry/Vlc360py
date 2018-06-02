@@ -26,7 +26,7 @@ class OSC_Server(vlc360.Player):
 
         self.dispatcher = dispatcher.Dispatcher()
         self.messages = []
-        self.threads = []
+        self.pan_threads = []
 
     def print_volume_handler(unused_addr, args, volume):
         print("[{0}] ~ {1}".format(args[0], volume))
@@ -90,10 +90,10 @@ class OSC_Server(vlc360.Player):
         #print("v :", v)
         self.player.mediaplayer.v = v
 
-        if len(self.threads) == 0:
-            self.loopThread = threading.Thread(target=self.player.playloop(v))
-            self.threads.append(self.loopThread)
-            self.loopThread.start()
+        if len(self.pan_threads) == 0:
+            self.pan_loopThread = threading.Thread(target=self.player.playloop(v))
+            self.pan_threads.append(self.pan_loopThread)
+            self.pan_loopThread.start()
 
         #else:
             #self.player.mediaplayer.video_update_viewpoint(v, False)
@@ -122,6 +122,10 @@ class OSC_Server(vlc360.Player):
 
         if self.player.mediaplayer.video_get_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation) > 0:
             self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, level)
+
+    def saturation(self, args, level):
+        self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
+        self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, level)
 
     def fade(self, args, level):
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
@@ -166,6 +170,11 @@ class OSC_Server(vlc360.Player):
         if self.messages == True: return self.messages
         else: return False
 
+    def watch_end(self):
+        print("watch end")
+
+
+
     def start_server(self):
         self.dispatcher.map("/filter", print)
         self.dispatcher.map("/pause", self.pause, "Hi")
@@ -178,6 +187,7 @@ class OSC_Server(vlc360.Player):
         self.dispatcher.map("/vlc/brightness", self.brightness)
         self.dispatcher.map("/vlc/yaw", self.adjust_yaw)
         self.dispatcher.map("/vlc/fade", self.fade)
+        self.dispatcher.map("/vlc/saturation", self.saturation)
 
         self.server = osc_server.ThreadingOSCUDPServer(
         (self.args.ip, self.args.port), self.dispatcher)
@@ -185,22 +195,16 @@ class OSC_Server(vlc360.Player):
         self.server.serve_forever()
 
     def startVlc(self):
-        #coords = [40, 20, 140, 80]
-        #file = 'V1.mp4'
+        """
+        Start the VLC player instance
+        :return:
+        """
 
         self.instance = vlc360.vlc.Instance()
-
-        #self.m = self.instance.media_new(file)
 
         self.player = vlc360.Player()
         self.player.show()
         # self.player.showFullScreen()
-
-
-        #print(file, coords, v)
-
-        #print(self.m)
-        #self.m.get_mrl()
 
         self.player.resize(1024, 768)
         if vlc360.sys.argv[1:]:
@@ -221,4 +225,3 @@ if __name__ == "__main__":
     servThread = threading.Thread(target=osc_serv.start_server)
     servThread.start()
     osc_serv.startVlc()
-
