@@ -48,8 +48,9 @@ class OSC_Server(vlc360.Player):
         :param coords: Orientation variables: yaw, pitch, roll, fov
         :return:
         """
-        i = vlc360.vlc.Instance()
-        m = i.media_new(str(file))
+
+        #i = vlc360.vlc.Instance()
+        m = self.instance.media_new(str(file))
 
         yaw = coords[0]
         pitch = coords[1]
@@ -65,7 +66,8 @@ class OSC_Server(vlc360.Player):
 
         self.player.mediaplayer.set_media(m)
         self.player.mediaplayer.play()
-        vlc360.vlc.libvlc_video_update_viewpoint(self.player.mediaplayer, v, True)
+        self.player.mediaplayer.video_update_viewpoint(v, True)
+        #vlc360.vlc.libvlc_video_update_viewpoint(self.player.mediaplayer, v, True)
 
     def adjust_yaw(self, args, yaw):
         print("YAW!")
@@ -114,8 +116,12 @@ class OSC_Server(vlc360.Player):
         self.player.mediaplayer.video_update_viewpoint(v, True)
 
     def brightness(self, args, level):
+        print("Brightness")
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable,1)
         self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness, level)
+
+        if self.player.mediaplayer.video_get_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation) > 0:
+            self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, level)
 
     def fade(self, args, level):
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
@@ -129,9 +135,10 @@ class OSC_Server(vlc360.Player):
 
         else:
             while c_lev < level:
-                c_lev += .001
+                c_lev += .01
                 time.sleep(.01)
                 self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness, c_lev)
+                self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, c_lev)
 
 
 
