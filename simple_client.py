@@ -24,22 +24,41 @@ if __name__ == "__main__":
 
     for x in range(1):
         client.send_message("/filter", random.random())
-        file = "V2.mp4"
+
+        level = 0.0
+        message = [level]
+        client.send_message("/vlc/brightness", message)
+
+        file = "V1.mp4"
         coords = [20, 0, 0, 80]
         message = [file, coords]
-        # client.send_message("/pause", True)
-        # client.send_message("/vlc/file", file)
         client.send_message("/vlc/file", message)
+        time.sleep(2)
+
+        level = 1.0
+        message=[level]
+        client.send_message("/vlc/fade", message)
+        time.sleep(2)
+
+
+        file = "V3.mp4"
+        coords = [100,8, 4, 120]
+        message = [file, coords]
+        client.send_message("/vlc/file", message)
+        """
+
+        
+
         time.sleep(1)
         coords = [0.04, 0.0, 0.00, 0.0]
         message = [coords]
-
+      
         time.sleep(1)
         # client.send_message("/vlc/pov", message)
         # time.sleep(1)
         client.send_message("/vlc/pan", message)
-        time.sleep(1)
-        coords = [0, 0, 0, 0]
+        time.sleep(2)
+        coords = [100, 0, 0, 300]
         message = [coords]
         # client.send_message("/vlc/pan", message)
         #yaw = 200
@@ -47,14 +66,18 @@ if __name__ == "__main__":
         #client.send_message("/vlc/yaw", message)
 
 
-
-        level = -2.0
+        level = 1.0
         message=[level]
-        #client.send_message("/vlc/fade", message)
+        client.send_message("/vlc/fade", message)
         time.sleep(2)
 
+        file = "V3.mp4"
+        coords = [0, 0, 0, 80]
+        message = [file, coords]
+        client.send_message("/vlc/file", message)
 
         #level = 1
         #message=[level]
         #client.send_message("/vlc/fade", message)
+        """
 
