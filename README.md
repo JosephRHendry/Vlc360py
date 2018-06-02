@@ -12,8 +12,8 @@ osc_simple_client.py
 
 ## OSC Commands ##
 /vlc/file {filename}  #optional# [yaw, pitch, roll, fov]<br>
-/vlc/pause
-/vlc/brightness {float 0-2.0}
-/vlc/fade {float level 0-2.0}
+/vlc/pause<br>
+/vlc/brightness {float 0-2.0}<br>
+/vlc/fade {float level 0-2.0}<br>
 etc. 
 
