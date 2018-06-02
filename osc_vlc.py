@@ -8,7 +8,7 @@ import math
 import vlc360_qt_7 as vlc360
 import threading
 import time
-
+import ob_threading as ob
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
@@ -50,7 +50,7 @@ class OSC_Server(vlc360.Player):
         """
 
         #i = vlc360.vlc.Instance()
-        m = self.instance.media_new(str(file))
+        self.m = self.instance.media_new(str(file))
 
         yaw = coords[0]
         pitch = coords[1]
@@ -59,12 +59,12 @@ class OSC_Server(vlc360.Player):
         v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
         print(file, coords, v)
 
-        print(m)
-        m.get_mrl()
+        print(self.m)
+        self.m.get_mrl()
 
         #self.player.mediaplayer.video_update_viewpoint(v, True)
 
-        self.player.mediaplayer.set_media(m)
+        self.player.mediaplayer.set_media(self.m)
         self.player.mediaplayer.play()
         self.player.mediaplayer.video_update_viewpoint(v, True)
         #vlc360.vlc.libvlc_video_update_viewpoint(self.player.mediaplayer, v, True)
@@ -78,7 +78,7 @@ class OSC_Server(vlc360.Player):
         """
         Continuously pans around in all directions at the increments specified
         :param args: n/a
-        :param coords: Orientation variables: yaw, pitch, roll, fov
+        :param coords: Orientation variables: yaw, pitch, roll, fov. Default of 0 means stopped
         :return:
         """
 
@@ -92,6 +92,7 @@ class OSC_Server(vlc360.Player):
 
         if len(self.pan_threads) == 0:
             self.pan_loopThread = threading.Thread(target=self.player.playloop(v))
+            #self.pan_loopThread = ob.ob_Thread()
             self.pan_threads.append(self.pan_loopThread)
             self.pan_loopThread.start()
 
@@ -128,19 +129,19 @@ class OSC_Server(vlc360.Player):
         self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, level)
 
     def fade(self, args, level):
-        print("args, level :", args, level)
+        #print("args, level :", args, level)
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
         c_lev = self.player.mediaplayer.video_get_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness)
         if c_lev > level:
             while c_lev > level:
-                c_lev -= .01
+                c_lev -= .05
                 time.sleep(.01)
                 self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness, c_lev)
                 self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, c_lev)
 
         else:
             while c_lev < level:
-                c_lev += .01
+                c_lev += .05
                 time.sleep(.01)
                 self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness, c_lev)
                 self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Saturation, c_lev)
@@ -173,14 +174,26 @@ class OSC_Server(vlc360.Player):
 
     def watch_end(self, args, level):
         print("watch end")
-        watch_thread = threading.Thread(target=self.check_state)
-        watch_thread.start()
+        self.watch_thread = threading.Thread(target=self.check_state)
+        self.watch_thread.start()
 
     def check_state(self):
         while not self.exit_flag.wait(timeout=0.01):
-            if self.player.mediaplayer.get_position() > .98:
-                print("yo!")
-                self.fade(0, -2.0)
+            total_time = self.m.get_duration()
+            current_time = self.player.mediaplayer.get_time()
+            #print("Current, total :", current_time, total_time)
+            if (total_time - current_time) < 500:
+                self.fade(0, -1.0)
+                time.sleep(.5)
+                """
+                To be implemented, threads stopping upon finishing.
+                """
+                if len(self.pan_threads) >0:
+                    self.self.pan_loopThread.stop()
+                self.watch_thread.stop()
+
+            #if self.player.mediaplayer.get_position() > .98:
+            #    self.fade(0, -1.0)
 
 
     def start_server(self):
