@@ -29,8 +29,8 @@ if __name__ == "__main__":
         message = [level]
         client.send_message("/vlc/brightness", message)
 
-        file = "V1.mp4"
-        coords = [20, 0, 0, 80]
+        file = "V2.mp4"
+        coords = [280, 0, 0, 80]
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(2)
@@ -46,12 +46,13 @@ if __name__ == "__main__":
 
         time.sleep(4)
 
-
+        """
         file = "V2.mp4"
         coords = [100,8, 4, 120]
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(3)
+        """
 
         level = 1.0
         message = [level]
@@ -68,8 +69,6 @@ if __name__ == "__main__":
 
 
         """
-
-        
 
         time.sleep(1)
         coords = [0.04, 0.0, 0.00, 0.0]
