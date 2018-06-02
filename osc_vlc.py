@@ -74,6 +74,11 @@ class OSC_Server(vlc360.Player):
         v = vlc360.vlc.VideoViewpoint(yaw)
         self.player.mediaplayer.video_update_viewpoint(v, True)
 
+    def playloop(self, v):
+        while not self.exit_flag.wait(timeout=0.01):
+            self.player.mediaplayer.video_update_viewpoint(self.player.mediaplayer.v, False)
+            continue
+
     def pan(self, args, coords=[0,0,0,0]):
         """
         Continuously pans around in all directions at the increments specified
@@ -91,7 +96,7 @@ class OSC_Server(vlc360.Player):
         self.player.mediaplayer.v = v
 
         if len(self.pan_threads) == 0:
-            self.pan_loopThread = threading.Thread(target=self.player.playloop(v))
+            self.pan_loopThread = threading.Thread(target=self.playloop(v))
             #self.pan_loopThread = ob.ob_Thread()
             self.pan_threads.append(self.pan_loopThread)
             self.pan_loopThread.start()
