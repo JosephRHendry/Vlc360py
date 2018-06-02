@@ -44,10 +44,6 @@ class Player(QtWidgets.QMainWindow):
             else:
                 self.showNormal()
                 self.switch = 0
-    def playloop(self, v):
-        while not self.exit_flag.wait(timeout=0.01):
-            self.mediaplayer.video_update_viewpoint(self.mediaplayer.v, False)
-            continue
 
 
     def createUI(self):
