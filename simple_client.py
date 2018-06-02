@@ -39,9 +39,9 @@ if __name__ == "__main__":
         message=[level]
         client.send_message("/vlc/fade", message)
 
-        coords = [0.02, 0, 0,0]
-        message = [coords]
-        client.send_message("/vlc/pan", message)
+        #coords = [0.02, 0, 0,0]
+        #message = [coords]
+        #client.send_message("/vlc/pan", message)
 
         time.sleep(4)
 
@@ -60,6 +60,8 @@ if __name__ == "__main__":
         level = 1.0
         message = [level]
         client.send_message("/vlc/saturation", message)
+
+        client.send_message("/vlc/watch_end", message)
 
 
 
