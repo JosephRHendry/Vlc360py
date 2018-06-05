@@ -6,6 +6,7 @@ waiting for 1 seconds between each value.
 import argparse
 import random
 import time
+import numpy as np
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -30,7 +31,7 @@ if __name__ == "__main__":
         client.send_message("/vlc/brightness", message)
 
         file = "V2.mp4"
-        coords = [280, 0, 0, 80]
+        coords = [3200, 0, 0, 80]
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(2)
@@ -44,7 +45,24 @@ if __name__ == "__main__":
         message = [coords]
         client.send_message("/vlc/pan", message)
 
-        time.sleep(4)
+        time.sleep(2)
+
+        # level = np.random.randint(0, 360)
+        # message=[level]
+        # client.send_message("/vlc/hue", message)
+        # time.sleep(3)
+        # level = np.random.randint(0, 360)
+        # message = [level]
+        # client.send_message("/vlc/hue", message)
+        # time.sleep(3)
+        # level = np.random.randint(0, 360)
+        # message = [level]
+        # client.send_message("/vlc/hue", message)
+        # time.sleep(3)
+        # level = np.random.randint(0, 360)
+        # message = [level]
+        # client.send_message("/vlc/hue", message)
+        # time.sleep(3)
 
         """
         file = "V2.mp4"
