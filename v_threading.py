@@ -1,5 +1,8 @@
 import threading
 import time
+import logging
+
+logging.basicConfig(filename='osc_vlc.log', level=logging.DEBUG)
 
 class v_thread(threading.Thread):
     """Thread class with a stop() method. The thread itself has to check
