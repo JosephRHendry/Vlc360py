@@ -11,7 +11,12 @@ python3 osc_vlc_360.py<br>
 osc_simple_client.py
 
 ## OSC Commands ##
-/vlc/file {filename}  #optional# [yaw, pitch, roll]<br>
-/vlc/pause
+format: "/filter" [message]
+A string indicating the function to run and a message consisting of a list of parameters
+
+/vlc/file {filename}  #optional# [yaw, pitch, roll, fov]<br>
+/vlc/pause<br>
+/vlc/brightness {float 0-2.0}<br>
+/vlc/fade {float level 0-2.0}<br>
 etc. 
 
