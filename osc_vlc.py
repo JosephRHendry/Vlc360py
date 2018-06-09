@@ -14,8 +14,10 @@ from pythonosc import dispatcher
 from pythonosc import osc_server
 
 logging.basicConfig(filename='osc_vlc.log', level=logging.DEBUG, format = '%(asctime)s %(message)s')
-class OscServer(vlc360.Player):
-    def start_osc(self):
+class OscServer():
+    def __init__(self):
+    #   super(v_thread, self).__init__(target=target, args=args)
+        self.player = vlc360.Player()
         logging.info("Setting OscServer parameters")
         self.parser = argparse.ArgumentParser()
         # self.parser.add_argument("--ip",
@@ -59,7 +61,7 @@ class OscServer(vlc360.Player):
         logging.info("Loading file {} at coords : {}".format(str(file), str(coords)))
         print("log?")
         # i = vlc360.vlc.Instance()
-        self.m = self.instance.media_new(str(file))
+        self.m = self.player.instance.media_new(str(file))
 
         yaw = coords[0]
         pitch = coords[1]
@@ -107,9 +109,9 @@ class OscServer(vlc360.Player):
         pitch = coords[1]
         roll = coords[2]
         field_of_view = coords[3]
-        v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
+
         # print("v :", v)
-        self.player.mediaplayer.v = v
+        self.player.mediaplayer.v = vlc360.vlc.VideoViewpoint(yaw, pitch, roll, field_of_view)
 
         if len(self.pan_threads) == 0:
             # self.pan_loopThread = threading.Thread(target=self.playloop(v))
@@ -155,6 +157,7 @@ class OscServer(vlc360.Player):
         self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Hue, level)
 
     def hue_fade(self, args, level):
+        logging.info("hue_fading to {}".format(str(level)))
         self.hue_fade_level = level
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
         l = len(self.hue_fade_threads)
@@ -163,8 +166,9 @@ class OscServer(vlc360.Player):
         self.hue_fade_threads[l].start()
 
     def hue_fade_loop(self):
+        logging.info("Entering hue_fade_loop")
         c_lev = self.player.mediaplayer.video_get_adjust_int(vlc360.vlc.VideoAdjustOption.Hue)
-        while not self.exit_flag.wait(timeout=0.01):
+        while not self.player.exit_flag.wait(timeout=0.01):
             if c_lev < 360:
                 c_lev += 2
             else:
@@ -172,7 +176,7 @@ class OscServer(vlc360.Player):
             self.player.mediaplayer.video_set_adjust_float(vlc360.vlc.VideoAdjustOption.Hue, c_lev)
     def fade(self, args, level):
         # print("args, level :", args, level)
-        logging.info("Fading to {}".format(level))
+        logging.info("Fading to {}".format(str(level)))
         self.fade_level = level
         self.player.mediaplayer.video_set_adjust_int(vlc360.vlc.VideoAdjustOption.Enable, 1)
         l = len(self.fade_threads)
@@ -184,7 +188,7 @@ class OscServer(vlc360.Player):
         logging.info("Entering fade loop")
         level = self.fade_level
         c_lev = self.player.mediaplayer.video_get_adjust_float(vlc360.vlc.VideoAdjustOption.Brightness)
-        while not self.exit_flag.wait(timeout=0.01):
+        while not self.player.exit_flag.wait(timeout=0.01):
             if c_lev > level:
                 # print("too bright c, l :", c_lev, level)
                 c_lev -= .05
@@ -193,6 +197,7 @@ class OscServer(vlc360.Player):
                 if c_lev <= level:
                     l = len(self.fade_threads)
                     self.fade_threads[l - 1].stop()
+                    logging.info("fade_thread #{}  stopped".format(l))
                     self.fade_threads = self.fade_threads[:-1]
                     break
 
@@ -204,23 +209,24 @@ class OscServer(vlc360.Player):
                 if c_lev >= level:
                     l = len(self.fade_threads)
                     self.fade_threads[l - 1].stop()
+                    logging.info("fade_thread #{}  stopped".format(l))
                     self.fade_threads = self.fade_threads[:-1]
                     break
             else:
                 break
 
-    def play(self, file, args):
-        """
-        Deprecated - see load_file, an polymorphic version of the same function
-        :param file: The file to play
-        :param args: n/a
-        :return:
-        """
-        i = vlc360.vlc.Instance()
-        m = i.media_new('V1.mp4')
-        m.get_mrl()
-        self.player.mediaplayer.set_media(m)
-        self.player.mediaplayer.play()
+    # def play(self, file, args):
+    #     """
+    #     Deprecated - see load_file, an polymorphic version of the same function
+    #     :param file: The file to play
+    #     :param args: n/a
+    #     :return:
+    #     """
+    #     i = vlc360.vlc.Instance()
+    #     m = i.media_new('V1.mp4')
+    #     m.get_mrl()
+    #     self.player.mediaplayer.set_media(m)
+    #     self.player.mediaplayer.play()
 
     def pause(self, args, null):
         logging.info("Pausing")
@@ -237,7 +243,7 @@ class OscServer(vlc360.Player):
             return False
 
     def watch_end(self, args, null):
-        logging.info("Entering watch end loop")
+        logging.info("Watching for end of program")
         self.watch_thread = vt.v_thread(target=self.check_end)
         self.watch_thread.start()
 
@@ -254,7 +260,7 @@ class OscServer(vlc360.Player):
     def check_end(self):
         logging.info("Entering check_end loop")
         end_fade = 0
-        while not self.exit_flag.wait(timeout=0.01):
+        while not self.player.exit_flag.wait(timeout=0.01):
             total_time = self.m.get_duration()
             current_time = self.player.mediaplayer.get_time()
             # print("Current, total :", current_time, total_time)
@@ -265,14 +271,16 @@ class OscServer(vlc360.Player):
                     # time.sleep(.5)
                 while len(self.pan_threads) > 0:
                     l = len(self.pan_threads)
-                    logging.info("Closing pan_threads current #{}".format(str(l)))
+                    logging.info("Closing pan_threads #{}".format(str(l)))
                     self.pan_threads[l - 1].stop()
+                    logging.info("pan_thread #{}  stopped".format(l))
                     self.pan_threads = self.pan_threads[:-1]
 
                 while len(self.fade_threads) > 0:
                     l = len(self.fade_threads)
-                    logging.info("Closing fade_threads current #{}".format(str(l)))
+                    logging.info("Closing fade_threads #{}".format(str(l)))
                     self.fade_threads[l - 1].stop()
+                    logging.info("fade_thread #{}  stopped".format(l))
                     self.fade_threads = self.fade_threads[:-1]
                 self.watch_thread.stop()
 
@@ -283,7 +291,6 @@ class OscServer(vlc360.Player):
     def start_server(self):
         self.dispatcher.map("/filter", print)
         self.dispatcher.map("/pause", self.pause)
-
         self.dispatcher.map("/volume", self.print_volume_handler, "Volume")
         self.dispatcher.map("/logvolume", self.print_compute_handler, "Log volume", math.log)
         self.dispatcher.map("/vlc/file", self.load_file)
@@ -297,6 +304,7 @@ class OscServer(vlc360.Player):
         self.dispatcher.map("/vlc/hue", self.hue)
         self.dispatcher.map("/vlc/loop", self.play_loop)
         self.dispatcher.map("/vlc/hue_fade", self.hue_fade)
+        logging.info("dispatcher.map set")
 
         self.server = osc_server.ThreadingOSCUDPServer(
             (self.args.ip, self.args.port), self.dispatcher)
@@ -304,17 +312,18 @@ class OscServer(vlc360.Player):
         self.server.serve_forever()
 
     def startVlc(self):
+
         logging.info("Calling the qt_VLC Player")
+
         """
         Start the VLC player instance
         :return:
         """
 
         # self.instance = vlc360.vlc.Instance()
-        # self.player = self.instance.media_player_new()
+        # self.player = vlc360.vlc.instance.media_player_new()
 
-        self.player = vlc360.Player()
-        # self.event_man = self.player.event_manager()
+#       # self.event_man = self.player.event_manager()
         self.event_man = vlc360.vlc.libvlc_media_player_event_manager(self.player.mediaplayer)
         self.event_man.event_attach(vlc360.vlc.EventType.MediaPlayerStopped, self.prep_end)
         # self.event_man.event_attach(vlc360.vlc.EventType.MediaPlayerPlaying, self.nothing_special)
@@ -333,13 +342,13 @@ class OscServer(vlc360.Player):
         self.threads.append(self.loopThread)
         self.loopThread.start()
         """
-        vlc360.sys.exit(self.app.exec_())
+        vlc360.sys.exit(self.player.app.exec_())
 
 if __name__ == "__main__":
-    logging.info("##osc_vlc started##")
+    logging.info("######################## osc_vlc started ########################")
     osc_serv = OscServer()
     logging.info("OscServer Initiated")
-    osc_serv.start_osc()
+    # osc_serv.start_osc()
     # osc_serv.start_server()
 
     servThread = vt.v_thread(target=osc_serv.start_server)
