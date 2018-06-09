@@ -36,6 +36,19 @@ if __name__ == "__main__":
         client.send_message("/vlc/file", message)
         time.sleep(2)
 
+
+        level = 2.0
+        message = [level]
+        client.send_message("/vlc/saturation", message)
+        # time.sleep(4)
+
+        message = [0]
+        client.send_message("/vlc/watch_end", message)
+
+        # status = True
+        # message = [status]
+        # #client.send_message("/vlc/loop", message)
+
         level = 1.0
         message=[level]
         client.send_message("/vlc/fade", message)
@@ -49,16 +62,10 @@ if __name__ == "__main__":
 
         # level = np.random.randint(0, 360)
         # message=[level]
-        # client.send_message("/vlc/hue", message)
-        # time.sleep(3)
-        # level = np.random.randint(0, 360)
-        # message = [level]
-        # client.send_message("/vlc/hue", message)
-        # time.sleep(3)
-        # level = np.random.randint(0, 360)
-        # message = [level]
-        # client.send_message("/vlc/hue", message)
-        # time.sleep(3)
+        # client.send_message("/vlc/hue_fade", message)
+        # time.sleep(5)
+
+
         # level = np.random.randint(0, 360)
         # message = [level]
         # client.send_message("/vlc/hue", message)
@@ -70,24 +77,17 @@ if __name__ == "__main__":
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(3)
-        """
+      
 
         level = 1.0
         message = [level]
         client.send_message("/vlc/saturation", message)
         time.sleep(4)
 
-        """level = 1.0
+        level = 1.0
         message = [level]
         client.send_message("/vlc/saturation", message)
-        """
-
-        client.send_message("/vlc/watch_end", message)
-
-
-
-        """
-
+     
         time.sleep(1)
         coords = [0.04, 0.0, 0.00, 0.0]
         message = [coords]
