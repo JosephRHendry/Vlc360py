@@ -5,13 +5,16 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 import threading
 
 #import vlc_position
+import logging
+
+logging.basicConfig(filename='osc_vlc.log', level=logging.DEBUG, format = '%(asctime)s %(message)s')
 
 class Player(QtWidgets.QMainWindow):
     """A simple Media Player using VLC and Qt
         """
 
     def __init__(self, master=None):
-
+        logging.info("Starting QT Player")
         self.app = QtWidgets.QApplication(sys.argv)
         QtWidgets.QMainWindow.__init__(self, master)
         self.setWindowTitle("Media Player")
@@ -20,6 +23,7 @@ class Player(QtWidgets.QMainWindow):
         # creating a basic vlc instance
         self.instance = vlc.Instance()
         # creating an empty vlc media player
+        logging.info("Starting VLC Player")
         self.mediaplayer = self.instance.media_player_new()
 
         self.createUI()
