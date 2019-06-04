@@ -1,4 +1,4 @@
-"""Small example OSC client
+"""Small example OSC client - Based on Sample Code
 
 This program sends 10 random values between 0.0 and 1.0 to the /filter address,
 waiting for 1 seconds between each value.
