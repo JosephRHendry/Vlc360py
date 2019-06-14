@@ -59,7 +59,7 @@ class OscServer():
         :return:
         """
         logging.info("Loading file {} at coords : {}".format(str(file), str(coords)))
-        print("log?")
+        # print("log?")
         # i = vlc360.vlc.Instance()
         self.m = self.player.instance.media_new(str(file))
 
@@ -83,7 +83,7 @@ class OscServer():
         # which should update the viewpoint. However, it currently displays a black frame only.
 
     def adjust_yaw(self, args, yaw):
-        print("YAW!")
+        # print("YAW!")
         v = vlc360.vlc.VideoViewpoint(yaw)
         self.player.mediaplayer.video_update_viewpoint(v, True)
 
@@ -249,7 +249,7 @@ class OscServer():
 
     def prep_end(self, null):
         logging.info("The mediaplayer has stopped. - EventManager")
-        print("It's done.")
+        # print("It's done.")
 
     def nothing_special(self):
         print("nothing special - EventManager")
