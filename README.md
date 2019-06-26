@@ -8,7 +8,7 @@ pip3 install python-osc
 
 ## Usage  ##
 python3 osc_vlc_360.py<br>
-osc_simple_client.py
+simple_client.py
 
 ## OSC Commands ##
 format: "/filter" [message]
