@@ -1,7 +1,5 @@
-"""Small example OSC client - Based on Sample Code
+"""Small example OSC client - Based on Sample Code integrated with VLC
 
-This program sends 10 random values between 0.0 and 1.0 to the /filter address,
-waiting for 1 seconds between each value.
 """
 import argparse
 import random
