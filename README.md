@@ -11,6 +11,7 @@ python3 osc_vlc.py<br>
 simple_client.py
 
 ## OSC Commands ##
+To be placed in the simple_client.py file.
 format: "/filter" [message]
 A string indicating the function to run and a message consisting of a list of parameters
 
