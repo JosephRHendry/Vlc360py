@@ -1,4 +1,4 @@
-"""Small example OSC server
+"""Small example OSC server code modified from OSC example code
 
 This program listens to several addresses, and prints some information about
 received packets.
