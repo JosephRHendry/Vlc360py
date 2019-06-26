@@ -24,24 +24,28 @@ if __name__ == "__main__":
     client = udp_client.SimpleUDPClient(args.ip, args.port)
 
     for x in range(1):
+        # Below are some sample commands to send to affect video playback.
         client.send_message("/filter", random.random())
 
+        # Sets default brightness
         level = 0.0
         message = [level]
         client.send_message("/vlc/brightness", message)
 
+        # This command loads a video
         file = "V2.mp4"
         coords = [3200, 0, 0, 80]
         message = [file, coords]
         client.send_message("/vlc/file", message)
         time.sleep(2)
 
-
+        # Ups saturation levels
         level = 2.0
         message = [level]
         client.send_message("/vlc/saturation", message)
         # time.sleep(4)
 
+        # This is used to watch for the end of a video to fade to black.
         message = [0]
         client.send_message("/vlc/watch_end", message)
 
@@ -49,11 +53,13 @@ if __name__ == "__main__":
         # message = [status]
         # #client.send_message("/vlc/loop", message)
 
+        # Fade to white
         level = 1.0
         message=[level]
         client.send_message("/vlc/fade", message)
         time.sleep(2)
 
+        # Pan to specified coordinates
         coords = [0.02, 0, 0,0]
         message = [coords]
         client.send_message("/vlc/pan", message)
