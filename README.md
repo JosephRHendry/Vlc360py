@@ -1,6 +1,7 @@
 # Vlc360py
 
 VLC Player Built on top of an OSC server with a focus on 360 video/ image
+Use the Dev channel for latest version.
 
 ## installation ##
 pip3 install python-vlc<br>
