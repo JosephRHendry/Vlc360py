@@ -7,7 +7,7 @@ pip3 install python-vlc<br>
 pip3 install python-osc
 
 ## Usage  ##
-python3 osc_vlc_360.py<br>
+python3 osc_vlc.py<br>
 simple_client.py
 
 ## OSC Commands ##
